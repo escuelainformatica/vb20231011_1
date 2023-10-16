@@ -13,7 +13,13 @@ Namespace Models
             MyBase.New(options)
         End Sub
 
+        Public Overridable Property Artista As DbSet(Of Artista)
+
+        Public Overridable Property Discos As DbSet(Of Disco)
+
         Public Overridable Property Marcas As DbSet(Of Marca)
+
+        Public Overridable Property Musicas As DbSet(Of Musica)
 
         Public Overridable Property Pais As DbSet(Of Pai)
 
@@ -29,6 +35,33 @@ Namespace Models
         Protected Overrides Sub OnModelCreating(modelBuilder As ModelBuilder)
             modelBuilder.UseCollation("Modern_Spanish_CI_AS")
 
+            modelBuilder.Entity(Of Artista)(
+                Sub(entity)
+                    entity.HasKey(Function(e) e.Id).HasName("PK__Artista__3214EC073214E96B")
+
+                    entity.Property(Function(e) e.Apellido).
+                        HasMaxLength(50).
+                        IsUnicode(False)
+                    entity.Property(Function(e) e.Nombre).
+                        HasMaxLength(50).
+                        IsUnicode(False)
+                End Sub)
+
+            modelBuilder.Entity(Of Disco)(
+                Sub(entity)
+                    entity.HasKey(Function(e) e.Id).HasName("PK__Disco__3214EC07CD09EBD6")
+
+                    entity.ToTable("Disco")
+
+                    entity.Property(Function(e) e.NombreDisco).
+                        HasMaxLength(50).
+                        IsUnicode(False)
+
+                    entity.HasOne(Function(d) d.IdArtistaNavigation).WithMany(Function(p) p.Discos).
+                        HasForeignKey(Function(d) d.IdArtista).
+                        HasConstraintName("FK_Disco_ToTable")
+                End Sub)
+
             modelBuilder.Entity(Of Marca)(
                 Sub(entity)
                     entity.HasKey(Function(e) e.Id).HasName("PK__Marcas__3214EC076095A537")
@@ -41,6 +74,21 @@ Namespace Models
                     entity.HasOne(Function(d) d.IdPaisNavigation).WithMany(Function(p) p.Marcas).
                         HasForeignKey(Function(d) d.IdPais).
                         HasConstraintName("FK_Marcas_ToTable")
+                End Sub)
+
+            modelBuilder.Entity(Of Musica)(
+                Sub(entity)
+                    entity.HasKey(Function(e) e.Id).HasName("PK__Musica__3214EC07AFB310F8")
+
+                    entity.ToTable("Musica")
+
+                    entity.Property(Function(e) e.Titulo).
+                        HasMaxLength(50).
+                        IsUnicode(False)
+
+                    entity.HasOne(Function(d) d.IdDiscoNavigation).WithMany(Function(p) p.Musicas).
+                        HasForeignKey(Function(d) d.IdDisco).
+                        HasConstraintName("FK_Musica_ToTable")
                 End Sub)
 
             modelBuilder.Entity(Of Pai)(
